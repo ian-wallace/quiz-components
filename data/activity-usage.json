@@ -1,0 +1,97 @@
+{
+  "class": [
+    "activity-usage",
+    "question-version-activity"
+  ],
+  "properties": {},
+  "links": [
+    {
+      "rel": [
+        "https://activities.api.brightspace.com/rels/activity-usage",
+        "self"
+      ],
+      "href": "base/data/activity-usage.json"
+    },
+    {
+      "rel": [
+        "https://activities.api.brightspace.com/rels/user-activity-usage",
+        "https://activities.api.brightspace.com/rels/my-activity-usage"
+      ],
+      "href": "base/data/user-activity-usage.json"
+    },
+    {
+      "rel": [
+        "https://api.brightspace.com/rels/dismiss"
+      ],
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.activities.api.proddev.d2l/activities/6606_qquestionversion_7~7/usages/6609/dismiss-info"
+    },
+    {
+      "rel": [
+        "https://api.brightspace.com/rels/organization"
+      ],
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.organizations.api.proddev.d2l/6609"
+    },
+    {
+      "rel": [
+        "https://activities.api.brightspace.com/rels/grade-candidates"
+      ],
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.activities.api.proddev.d2l/activities/6606_qquestionversion_7~7/usages/6609/grade-candidates?gradeTypes=63&includeGradesWithDirectRubrics=0"
+    },
+    {
+      "rel": [
+        "https://activities.api.brightspace.com/rels/new-grade-association"
+      ],
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.activities.api.proddev.d2l/activities/6606_qquestionversion_7~7/usages/6609/new-grade-association"
+    },
+    {
+      "rel": [
+        "https://activities.api.brightspace.com/rels/associations"
+      ],
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.activities.api.proddev.d2l/activities/6606_qquestionversion_7~7/usages/6609/associations"
+    },
+    {
+      "rel": [
+        "https://activities.api.brightspace.com/rels/direct-associations"
+      ],
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.activities.api.proddev.d2l/activities/6606_qquestionversion_7~7/usages/6609/associations?direct=1"
+    },
+    {
+      "rel": [
+        "https://alignments.api.brightspace.com/rels/legacy-competencies"
+      ],
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.alignments.api.proddev.d2l/activity-usage/6609/legacy-competencies?ActivityBatchId=6606_qquestionversion_7~7"
+    },
+    {
+      "rel": [
+        "https://alignments.api.brightspace.com/rels/alignments"
+      ],
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.alignments.api.proddev.d2l/activity-usage/6609?ActivityBatchId=6606_qquestionversion_7~7"
+    },
+    {
+      "rel": [
+        "https://achievements.api.brightspace.com/rels/demonstrations"
+      ],
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.achievements.api.proddev.d2l/activities/6606_qquestionversion_7~7/usage/6609/demonstrations"
+    },
+    {
+      "rel": [
+        "https://api.brightspace.com/rels/questions/question",
+        "https://api.brightspace.com/rels/specialization"
+      ],
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.questions.api.proddev.d2l/question/6609/7/7"
+    }
+  ],
+  "actions": [
+    {
+      "href": "https://dfdb7e15-7355-4554-a9a5-dbf6b8aee6e7.activities.api.proddev.d2l/activities/6606_qquestionversion_7~7/usages/6609/associations",
+      "name": "query-associations",
+      "method": "GET",
+      "fields": [
+        {
+          "type": "text",
+          "name": "type"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+	"rel":["https://assignments.api.brightspace.com/rels/external"],
+	"properties":{
+    "name":"Cellular 5G radiation",
+    "description": "H5P Question"
+	}
+}

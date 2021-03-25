@@ -5,7 +5,7 @@
 		<script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
 		<script type="module">
 			import '@brightspace-ui/core/components/demo/demo-page.js';
-			import '../src/components/d2l-activity-question-points.js';
+			import '../src/components/d2l-activity-question-usage.js';
 		</script>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -20,7 +20,7 @@
 		window.demo = true;
 	</script>
 	<body unresolved>
-		<d2l-demo-page page-title="d2l-activity-question-points">
+		<d2l-demo-page page-title="d2l-activity-question-usage">
 
 			<h2>Default</h2>
 
@@ -30,10 +30,12 @@
 
 			<d2l-demo-snippet>
 				<template>
-					<d2l-activity-question-points
-					href="./data/activity-collection.json"
-					token="anything">
-					</d2l-activity-question-points>
+					<d2l-activity-question-usage
+						href="data/d2l-activity-question-usage-chained.json"
+						token="anytoken">
+					</d2l-activity-question-usage>
+					<d2l-activity-name href="data/activity.json" token="whatever"></d2l-activity-name>
+
 				</template>
 			</d2l-demo-snippet>
 

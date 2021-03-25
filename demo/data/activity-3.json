@@ -1,0 +1,7 @@
+{
+	"rel":["https://assignments.api.brightspace.com/rels/external"],
+	"properties":{
+    "name":"Cellular composition",
+    "description": "H5P Question"
+	}
+}

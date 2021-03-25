@@ -155,7 +155,6 @@ class ActivityQuestionPoints extends BaseMixin(LitElement) {
 					</d2l-list>
 				</div>
 			</div>
-
 			<div class="button_group">
 				<d2l-button
 					class="button_group__button"
