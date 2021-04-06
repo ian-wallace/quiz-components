@@ -4,20 +4,24 @@ import '@brightspace-ui/core/components/list/list-item.js';
 import '@brightspace-ui/core/components/list/list-item-content.js';
 import '@brightspace-ui/core/components/inputs/input-number.js';
 import '@brightspace-ui/core/components/colors/colors.js';
+import './d2l-activity-question-usage.js';
 
-import { css, html, LitElement } from 'lit-element/lit-element.js';
+import { css, LitElement } from 'lit-element/lit-element.js';
 import { heading4Styles, labelStyles } from '@brightspace-ui/core/components/typography/styles.js';
+import { HypermediaStateMixin, observableTypes } from '@brightspace-hmc/foundation-engine/framework/lit/HypermediaStateMixin';
 import { BaseMixin } from '../mixins/base-mixin';
-import { QuizServiceFactory } from '../services/quizServiceFactory';
+import { html } from '@brightspace-hmc/foundation-engine/framework/lit/hypermedia-components';
 
-class ActivityQuestionPoints extends BaseMixin(LitElement) {
+class ActivityQuestionPoints extends HypermediaStateMixin(BaseMixin(LitElement)) {
 	static get properties() {
 		return {
 			updateDisabled: {
 				type: Boolean
 			},
-			questions: {
-				type: Array
+			_questions: {
+				observable: observableTypes.subEntities,
+				rel: 'item',
+				prime: true
 			}
 		};
 	}
@@ -41,13 +45,6 @@ class ActivityQuestionPoints extends BaseMixin(LitElement) {
 				padding: 30px;
 				padding-top: 0;
 			}
-			.activity_list__points_input {
-				display: flex;
-				align-items: baseline;
-			}
-			.points_input__label {
-				margin: 12px;
-			}
 			.button_group {
 				margin: 30px;
 			}
@@ -69,19 +66,12 @@ class ActivityQuestionPoints extends BaseMixin(LitElement) {
 	constructor() {
 		super();
 		this.updateDisabled = false;
-
-		this.quizService = QuizServiceFactory.getQuizService();
-	}
-
-	async connectedCallback() {
-		super.connectedCallback();
-
-		this.questions = await this.quizService.getQuestions();
 	}
 
 	_validation() {
-		this.updateDisabled = this.questions.reduce((result, question) => {
-			return result || !this.shadowRoot.querySelector(`#points_input_${question.id}`).value;
+		this.updateDisabled = this._questions.reduce((result, question) => {
+			const activityQuestionUsage = this.shadowRoot.querySelector(`#activity_question_usage_${question.properties.id}`);
+			return result || !activityQuestionUsage || !activityQuestionUsage.points || activityQuestionUsage.points <= 0;
 		}, false);
 	}
 
@@ -89,52 +79,37 @@ class ActivityQuestionPoints extends BaseMixin(LitElement) {
 		this._validation();
 
 		if (!this.updateDisabled) {
-			const results = this.questions.reduce((result, question) => {
-				const value = this.shadowRoot.querySelector(`#points_input_${question.id}`).value;
-				if (value) {
-					result.push({
-						id: question.id,
-						value
-					});
-				}
-				return result;
-			}, []);
+			//temporary way of pushing the state
+			this.shadowRoot.querySelectorAll('d2l-activity-question-usage').forEach(element => {
+				element._state.push();
+			});
 
-			this.quizService.updateQuestionPoints(results);
+			(window.opener || window.parent).postMessage(
+				{
+					subject: 'question_points_updated'
+				},
+				'*'
+			);
 		}
 	}
 
 	_cancelUpdate() {
-		console.log('Cancelling update');
+		(window.opener || window.parent).postMessage(
+			{
+				subject: 'question_points_updated'
+			},
+			'*'
+		);
 	}
 
 	_renderQuestion(question) {
 		return html`
-		<d2l-list-item>
-			<d2l-list-item-content>
-				<div>
-					${ question.title }
-				</div>
-				<div slot="secondary">
-					${ question.secondary }
-				</div>
-			</d2l-list-item-content>
-			<div class="activity_list__points_input" slot="actions">
-				<label for="points_input_${question.id}" class="points_input__label d2l-label-text">
-					${this.localize('inputLabelPoints')}
-				</label>
-				<d2l-input-number
-					id="points_input_${question.id}"
-					label=${this.localize('inputLabelPoints')}
-					value=${ question.points }
-					@change=${this._validation}
-					min=0
-					min-exclusive
-					required
-					label-hidden>
-				</d2l-input-number>
-			</div>
-		</d2l-list-item>
+		<d2l-activity-question-usage
+			id='activity_question_usage_${question.properties.id}'
+			href=${question.href}
+			.token=${this.token}
+			@d2l-activity-question-usage-input-updated=${this._validation}>
+		</d2l-activity-question-usage>
 		`;
 	}
 
@@ -151,7 +126,7 @@ class ActivityQuestionPoints extends BaseMixin(LitElement) {
 				</div>
 				<div class="main_body__activity_list">
 					<d2l-list separators="between">
-						${ this.questions?.map(question => this._renderQuestion(question)) }
+						${ this._questions?.map(question => this._renderQuestion(question)) }
 					</d2l-list>
 				</div>
 			</div>
@@ -173,4 +148,7 @@ class ActivityQuestionPoints extends BaseMixin(LitElement) {
 	}
 }
 
-customElements.define('d2l-activity-question-points', ActivityQuestionPoints);
+customElements.define(
+	'd2l-activity-question-points',
+	ActivityQuestionPoints,
+);

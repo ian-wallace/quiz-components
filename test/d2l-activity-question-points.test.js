@@ -1,115 +1,110 @@
-import '../src/components/d2l-activity-question-points.js';
-import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import { QuizServiceFactory } from '../src/services/quizServiceFactory';
-import { QuizTestService } from './utilities/quizTestService';
+import '../src/components/d2l-activity-question-points';
+import { activityCollection, activityCollectionSingleItem, mockActivityCollection } from './data/mockData';
+import { addToMock, mockLink } from './data/fetchMock';
+import { expect, html } from '@open-wc/testing';
+import { clearStore } from '@brightspace-hmc/foundation-engine/state/HypermediaState.js';
+import { createComponentAndWait } from '@brightspace-hmc/foundation-components/test/test-util';
 import { runConstructor } from '@brightspace-ui/core/tools/constructor-test-helper.js';
-import sinon from 'sinon';
+// import { stub } from 'sinon';
 
-const defaultFixture = html`
-<d2l-activity-question-points></d2l-activity-question-points>
-`;
-
-let getQuizServiceStub;
-
-const defaultQuestions = [
-	{
-		'id': 1,
-		'title': 'Title1',
-		'secondary': 'Description1',
-		'points': 1
-	},
-	{
-		'id': 2,
-		'title': 'Title2',
-		'secondary': 'Description2',
-		'points': 2
-	},
-	{
-		'id': 3,
-		'title': 'Title3',
-		'secondary': 'Description3',
-		'points': 3
-	}
-];
+async function _createComponent(path) {
+	return await createComponentAndWait(html`<d2l-activity-question-points href="${path}" token="test-token"></d2l-activity-question-points>`);
+}
 
 describe('d2l-activity-question-points', () => {
+	const activityCollectionHref = '/activity-collection';
+	const activityCollection2Href = '/activity-collection-2';
+
+	before(() => {
+		mockLink.reset();
+		// add appropriate data to fetch mock
+		addToMock(
+			activityCollectionHref,
+			mockActivityCollection(
+				activityCollection,
+				_createComponent
+			),
+			_createComponent
+		);
+
+		addToMock(
+			activityCollection2Href,
+			mockActivityCollection(
+				activityCollectionSingleItem,
+				_createComponent
+			),
+			_createComponent
+		);
+	});
+
+	after(() => {
+		mockLink.reset();
+	});
+
 	describe('accessibility', () => {
 		it('should pass all axe tests', async() => {
-			const el = await fixture(defaultFixture);
+			const el = await _createComponent(activityCollectionHref);
 			await expect(el).to.be.accessible();
 		});
 	});
 
-	describe('constructor', () => {
+	describe('construction', () => {
 		it('should construct', () => {
 			expect(() => runConstructor('d2l-activity-question-points')).to.not.throw();
 		});
 	});
 
-	describe('displays questions', () => {
+	describe('functionality', () => {
+		// tests to ensure component is functioning as desired
 		beforeEach(() => {
-			getQuizServiceStub = sinon.stub(QuizServiceFactory, 'getQuizService');
+			clearStore();
 		});
 
 		afterEach(() => {
-			getQuizServiceStub.restore();
-			fixtureCleanup();
+			mockLink.resetHistory();
 		});
 
-		it('Displays no questions', async() => {
-			setupTestData({
-				questions: []
+		it('should display a list of questions', async() => {
+			const el = await _createComponent(activityCollectionHref);
+			const rows = el.shadowRoot.querySelectorAll('d2l-activity-question-usage');
+
+			expect(rows.length).to.equal(activityCollection.length);
+		});
+
+		it('should display a single question', async() => {
+			const el = await _createComponent(activityCollection2Href);
+			const rows = el.shadowRoot.querySelectorAll('d2l-activity-question-usage');
+
+			expect(rows.length).to.equal(activityCollectionSingleItem.length);
+		});
+
+		const invalidValues = [0, -1, null, undefined];
+
+		invalidValues.forEach(invalidValue => {
+			it(`should disable update button for ${invalidValue}`, async() => {
+				const el = await _createComponent(activityCollectionHref);
+				const activityQuestionUsage = el.shadowRoot.querySelector('d2l-activity-question-usage');
+
+				expect(el.updateDisabled).to.equal(false);
+
+				activityQuestionUsage.points = invalidValue;
+				const updateEvent = new CustomEvent('d2l-activity-question-usage-input-updated');
+				activityQuestionUsage.dispatchEvent(updateEvent);
+
+				expect(el.updateDisabled).to.equal(true);
 			});
-
-			const el = await fixture(defaultFixture);
-			const rows = el.shadowRoot.querySelectorAll('d2l-list-item');
-			expect(rows.length).to.equal(0);
 		});
 
-		it('Displays all questions', async() => {
-			setupTestData({
-				questions: defaultQuestions
-			});
+		it('on update points state gets pushed', async() => {
+			// const el = await _createComponent(activityCollectionHref);
+			// const updateButton = el.shadowRoot.querySelector('.button_group__button');
 
-			const el = await fixture(defaultFixture);
-			const rows = el.shadowRoot.querySelectorAll('d2l-list-item');
-			expect(rows.length).to.equal(3);
-		});
-	});
+			// const pushStub = stub(el._state, 'push');
 
-	describe('user can change point values', () => {
-		beforeEach(() => {
-			getQuizServiceStub = sinon.stub(QuizServiceFactory, 'getQuizService');
-		});
+			// const clickEvent = new CustomEvent('click');
+			// updateButton.dispatchEvent(clickEvent);
 
-		afterEach(() => {
-			getQuizServiceStub.restore();
-			fixtureCleanup();
-		});
-
-		it('Button is disabled if invalid field', async() => {
-			setupTestData({
-				questions: defaultQuestions
-			});
-
-			const el = await fixture(defaultFixture);
-
-			expect(el.updateDisabled).to.equal(false);
-
-			const input_1 = el.shadowRoot.querySelector('#points_input_1');
-			input_1.setAttribute('value', 0);
-			// Needed because changing the value through code does not trigger the change event
-			el._validation();
-
-			expect(el.updateDisabled).to.equal(true);
+			// expect(pushStub).to.have.callCount(1);
 		});
 	});
 });
-
-function setupTestData({ questions }) {
-	const patches = {};
-	if (questions && Array.isArray(questions)) {
-		patches['getQuestions'] = async() => questions;
-	}
-	getQuizServiceStub.returns(new QuizTestService(patches));
-}

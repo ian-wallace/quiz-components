@@ -5,13 +5,13 @@ import '@brightspace-ui/core/components/colors/colors.js';
 import '@brightspace-hmc/foundation-components/components/activity/name/d2l-activity-name';
 import '@brightspace-hmc/foundation-components/components/activity/type/d2l-activity-type';
 import { css, LitElement } from 'lit-element/lit-element.js';
-import { customHypermediaElement, html } from '@brightspace-hmc/foundation-engine/framework/lit/hypermedia-components';
 import { HypermediaStateMixin, observableTypes } from '@brightspace-hmc/foundation-engine/framework/lit/HypermediaStateMixin';
 import { BaseMixin } from '../mixins/base-mixin';
+import { html } from '@brightspace-hmc/foundation-engine/framework/lit/hypermedia-components';
+import { labelStyles } from '@brightspace-ui/core/components/typography/styles.js';
 
 const rels = Object.freeze({
 	activityUsage: 'https://activities.api.brightspace.com/rels/activity-usage',
-	external: 'https://assignments.api.brightspace.com/rels/external',
 	assignment: 'https://api.brightspace.com/rels/assignment',
 	userActivityUsage: 'https://activities.api.brightspace.com/rels/user-activity-usage'
 });
@@ -28,20 +28,22 @@ class ActivityQuestionUsage extends HypermediaStateMixin(BaseMixin(LitElement)) 
 				}, {
 					observable: observableTypes.link,
 					rel: rels.userActivityUsage
-				}]
+				}],
+				prime: true
 			},
 			_activityUsageHref: {
 				observable: observableTypes.link,
-				rel: rels.activityUsage
+				rel: rels.activityUsage,
+				prime: true
 			},
 			_setPoints: {
-				type: Object,
 				observable: observableTypes.action,
 				name: 'set-points'
 			},
-			id: {
+			questionId: {
 				type: String,
-				observable: observableTypes.property
+				observable: observableTypes.property,
+				name: 'id'
 			},
 			points: {
 				type: String,
@@ -52,26 +54,33 @@ class ActivityQuestionUsage extends HypermediaStateMixin(BaseMixin(LitElement)) 
 
 	static get styles() {
 		return [ css`
+		.activity_list__points_input {
+			display: flex;
+			align-items: baseline;
+		}
 		.points_input__label {
 			margin: 12px;
 		}
-		` ];
+		`,
+		labelStyles ];
 	}
 
 	_onInputChange(e) {
 		if (!this._setPoints.has) {
 			return;
 		}
-		const points = e.currentTarget.value;
+
 		this._setPoints.commit(
 			{
 				points: {
 					observable: observableTypes.property,
-					value: points
+					value: e.currentTarget.value
 				}
 			}
 		);
-		this._state.push();
+
+		const updateEvent = new CustomEvent('d2l-activity-question-usage-input-updated');
+		this.dispatchEvent(updateEvent);
 	}
 
 	render() {
@@ -86,11 +95,11 @@ class ActivityQuestionUsage extends HypermediaStateMixin(BaseMixin(LitElement)) 
 				</div>
 			</d2l-list-item-content>
 			<div class="activity_list__points_input" slot="actions">
-				<label for="points_input_${this.id}" class="points_input__label d2l-label-text">
+				<label for="points_input_${this.questionId}" class="points_input__label d2l-label-text">
 					${this.localize('inputLabelPoints')}
 				</label>
 				<d2l-input-number
-					id="points_input_${this.id}"
+					id="points_input_${this.questionId}"
 					label=${this.localize('inputLabelPoints')}
 					value=${ this.points }
 					@change="${this._onInputChange}"
@@ -105,7 +114,8 @@ class ActivityQuestionUsage extends HypermediaStateMixin(BaseMixin(LitElement)) 
 	}
 
 }
-customHypermediaElement(
+
+customElements.define(
 	'd2l-activity-question-usage',
-	ActivityQuestionUsage,
+	ActivityQuestionUsage
 );

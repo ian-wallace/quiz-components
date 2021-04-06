@@ -1,6 +1,7 @@
 import '../src/components/d2l-activity-question-usage';
 import { addToMock, mockLink } from './data/fetchMock';
 import { expect, html } from '@open-wc/testing';
+import { mockActivityQuestionUsage, mockActivityUsage, mockUserActivityUsage } from './data/mockData';
 import { clearStore } from '@brightspace-hmc/foundation-engine/state/HypermediaState.js';
 import { createComponentAndWait } from '@brightspace-hmc/foundation-components/test/test-util';
 import { runConstructor } from '@brightspace-ui/core/tools/constructor-test-helper.js';
@@ -9,19 +10,43 @@ async function _createComponent(path) {
 	return await createComponentAndWait(html`<d2l-activity-question-usage href="${path}" token="test-token"></d2l-activity-question-usage>`);
 }
 
-describe.only('d2l-activity-question-usage', () => {
+describe('d2l-activity-question-usage', () => {
+	const id = 13;
+	const points = 20;
+	const activityQuestionUsageHref = '/activity-question-usage';
+	const activityUsageHref = '/activity-usage';
+	const userActivityUsageHref = '/user-activity-usage';
+	const assignmentHref = '/assignment';
+
 	before(() => {
 		mockLink.reset();
 		// add appropriate data to fetch mock
-		addToMock('/activity-question-usage', {
-			rel: [
-				'item'
-			],
-			properties: {
-				id: '1',
-				points: 10
-			}},
-		_createComponent
+		addToMock(
+			activityQuestionUsageHref,
+			mockActivityQuestionUsage(
+				id,
+				points,
+				activityUsageHref
+			),
+			_createComponent
+		);
+
+		addToMock(
+			activityUsageHref,
+			mockActivityUsage(userActivityUsageHref),
+			_createComponent
+		);
+
+		addToMock(
+			userActivityUsageHref,
+			mockUserActivityUsage(assignmentHref),
+			_createComponent
+		);
+
+		addToMock(
+			assignmentHref,
+			{},
+			_createComponent
 		);
 	});
 
@@ -31,7 +56,7 @@ describe.only('d2l-activity-question-usage', () => {
 
 	describe('accessibility', () => {
 		it('should pass all axe tests', async() => {
-			const el = await _createComponent('/activity-question-usage');
+			const el = await _createComponent(activityQuestionUsageHref);
 			await expect(el).to.be.accessible();
 		});
 	});
@@ -52,15 +77,28 @@ describe.only('d2l-activity-question-usage', () => {
 			mockLink.resetHistory();
 		});
 
-		it('should display correct question', async() => {
-			const el = await _createComponent('/activity-question-usage');
-			const rows = el.shadowRoot.querySelectorAll('d2l-list-item');
-			expect(rows.length).to.equal(1);
+		it('should display correct data', async() => {
+			const el = await _createComponent(activityQuestionUsageHref);
+			const name = el.shadowRoot.querySelector('d2l-hc-name');
+			const input = el.shadowRoot.querySelector(`#points_input_${id}`);
+
+			expect(name.href).to.equal(assignmentHref);
+			expect(input.value).to.equal(points);
 		});
 
-		it('should allow a user to change point values', async() => {
-			await _createComponent('/activity-question-usage');
-			//fill this in
+		it('event gets triggered', async() => {
+			const newPoints = 50;
+
+			const el = await _createComponent(activityQuestionUsageHref);
+			const input = el.shadowRoot.querySelector(`#points_input_${id}`);
+
+			el.addEventListener('d2l-activity-question-usage-input-updated', () => {
+				expect(el.points).to.equal(newPoints);
+			});
+
+			input.value = newPoints;
+			const updateEvent = new CustomEvent('change');
+			input.dispatchEvent(updateEvent);
 		});
 	});
 });
