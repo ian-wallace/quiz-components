@@ -27,6 +27,10 @@ export function mockActivityCollection(activityQuestionUsages, createComponent) 
 			),
 			createComponent
 		);
+
+		addToMock(
+			activityUsageHref, {}, createComponent
+		);
 	});
 
 	return {

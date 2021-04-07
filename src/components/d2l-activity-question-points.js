@@ -69,31 +69,24 @@ class ActivityQuestionPoints extends HypermediaStateMixin(BaseMixin(LitElement))
 	}
 
 	_validation() {
+		console.log(this._questions);
 		this.updateDisabled = this._questions.reduce((result, question) => {
 			const activityQuestionUsage = this.shadowRoot.querySelector(`#activity_question_usage_${question.properties.id}`);
-			return result || !activityQuestionUsage || !activityQuestionUsage.points || activityQuestionUsage.points <= 0;
+			return result || !activityQuestionUsage || !activityQuestionUsage.isValid();
 		}, false);
 	}
 
-	_updatePoints() {
+	async _updatePoints() {
 		this._validation();
 
 		if (!this.updateDisabled) {
-			//temporary way of pushing the state
-			this.shadowRoot.querySelectorAll('d2l-activity-question-usage').forEach(element => {
-				element._state.push();
-			});
+			await this._state.push();
 
-			(window.opener || window.parent).postMessage(
-				{
-					subject: 'question_points_updated'
-				},
-				'*'
-			);
+			this._notifyParent();
 		}
 	}
 
-	_cancelUpdate() {
+	_notifyParent() {
 		(window.opener || window.parent).postMessage(
 			{
 				subject: 'question_points_updated'
@@ -140,7 +133,7 @@ class ActivityQuestionPoints extends HypermediaStateMixin(BaseMixin(LitElement))
 				</d2l-button>
 				<d2l-button
 					class="button_group__button"
-					@click=${this._cancelUpdate}>
+					@click=${this._notifyParent}>
 					${this.localize('buttonCancel')}
 				</d2l-button>
 			</div>

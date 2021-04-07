@@ -19,6 +19,7 @@ describe('d2l-activity-question-usage', () => {
 	const assignmentHref = '/assignment';
 
 	before(() => {
+		clearStore();
 		mockLink.reset();
 		// add appropriate data to fetch mock
 		addToMock(
@@ -99,6 +100,18 @@ describe('d2l-activity-question-usage', () => {
 			input.value = newPoints;
 			const updateEvent = new CustomEvent('change');
 			input.dispatchEvent(updateEvent);
+		});
+
+		const invalidValues = [0, -1, null, undefined, 10000];
+
+		invalidValues.forEach(invalidValue => {
+			it(`should be invalid for ${invalidValue}`, async() => {
+				const el = await _createComponent(activityQuestionUsageHref);
+
+				el.points = invalidValue;
+
+				expect(!el.isValid()).to.be.true;
+			});
 		});
 	});
 });

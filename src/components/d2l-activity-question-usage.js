@@ -16,6 +16,9 @@ const rels = Object.freeze({
 	userActivityUsage: 'https://activities.api.brightspace.com/rels/user-activity-usage'
 });
 
+const MIN_VALUE = 0;
+const MAX_VALUE = 9999;
+
 class ActivityQuestionUsage extends HypermediaStateMixin(BaseMixin(LitElement)) {
 	static get properties() {
 		return {
@@ -83,6 +86,10 @@ class ActivityQuestionUsage extends HypermediaStateMixin(BaseMixin(LitElement)) 
 		this.dispatchEvent(updateEvent);
 	}
 
+	isValid() {
+		return this.points && this.points > MIN_VALUE && this.points <= MAX_VALUE;
+	}
+
 	render() {
 		return html`
 		<d2l-list-item>
@@ -103,7 +110,8 @@ class ActivityQuestionUsage extends HypermediaStateMixin(BaseMixin(LitElement)) 
 					label=${this.localize('inputLabelPoints')}
 					value=${ this.points }
 					@change="${this._onInputChange}"
-					min=0
+					min=${MIN_VALUE}
+					max=${MAX_VALUE}
 					min-exclusive
 					required
 					label-hidden>
