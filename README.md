@@ -23,3 +23,4 @@ Releases occur based on the most recent commit message:
 * Commits which contain `[increment major]` will trigger a `major` release. Example: `[increment major] breaking all the things`
 
 **Note:** When merging a pull request, this will be the merge commit message.
+
