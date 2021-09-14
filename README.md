@@ -4,6 +4,11 @@
 Contains various BSI components used by quizzing.
 
 ## Components
+ - `d2l-activity-question-usage` is the component for displaying a single external activity question as a list item
+ - `d2l-activity-question-points` is the component for displaying a collection of external activity questions
+
+## Running Locally
+`npm run start` will start an es-dev server that uses the data in `demo/data`
 
 ## Testing
 

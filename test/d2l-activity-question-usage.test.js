@@ -1,47 +1,46 @@
 import '../src/components/d2l-activity-question-usage';
 import { addToMock, mockLink } from './data/fetchMock';
 import { expect, html } from '@open-wc/testing';
-import { mockActivityQuestionUsage, mockActivityUsage } from './data/mockData';
+import { mockActivityQuestionUsage, mockActivityUsage, mockLinkPlacement } from './data/mockData';
 import { clearStore } from '@brightspace-hmc/foundation-engine/state/HypermediaState.js';
 import { createComponentAndWait } from '@brightspace-hmc/foundation-components/test/test-util';
 import { runConstructor } from '@brightspace-ui/core/tools/constructor-test-helper.js';
+
+const id = 13;
+const points = 20;
+const activityQuestionUsageHref = '/activity-question-usage';
+const activityUsageHref = '/activity-usage';
+const linkPlacementHref = '/link-placement';
 
 async function _createComponent(path) {
 	return await createComponentAndWait(html`<d2l-activity-question-usage href="${path}" token="test-token"></d2l-activity-question-usage>`);
 }
 
-describe('d2l-activity-question-usage', () => {
-	const id = 13;
-	const points = 20;
-	const activityQuestionUsageHref = '/activity-question-usage';
-	const activityUsageHref = '/activity-usage';
-	const linkPlacementHref = '/link-placement';
+function setupFetchMocks({ activityQuestionUsage = null, activityUsage = null, linkPlacement = null } = {}) {
+	addToMock(
+		activityQuestionUsageHref,
+		activityQuestionUsage ? activityQuestionUsage : mockActivityQuestionUsage(id, points, activityUsageHref),
+		_createComponent
+	);
 
+	addToMock(
+		activityUsageHref,
+		activityUsage ? activityUsage : mockActivityUsage(linkPlacementHref),
+		_createComponent
+	);
+
+	addToMock(
+		linkPlacementHref,
+		linkPlacement ? linkPlacement : mockLinkPlacement(linkPlacementHref, 'some description'),
+		_createComponent
+	);
+}
+
+describe('d2l-activity-question-usage', () => {
 	before(() => {
 		clearStore();
 		mockLink.reset();
-		// add appropriate data to fetch mock
-		addToMock(
-			activityQuestionUsageHref,
-			mockActivityQuestionUsage(
-				id,
-				points,
-				activityUsageHref
-			),
-			_createComponent
-		);
-
-		addToMock(
-			activityUsageHref,
-			mockActivityUsage(linkPlacementHref),
-			_createComponent
-		);
-
-		addToMock(
-			linkPlacementHref,
-			{},
-			_createComponent
-		);
+		setupFetchMocks();
 	});
 
 	after(() => {
@@ -71,13 +70,36 @@ describe('d2l-activity-question-usage', () => {
 			mockLink.resetHistory();
 		});
 
-		it('should display correct data', async() => {
-			const el = await _createComponent(activityQuestionUsageHref);
-			const name = el.shadowRoot.querySelector('d2l-hc-name');
-			const input = el.shadowRoot.querySelector(`#points_input_${id}`);
+		describe('displays correct data', () => {
+			it('should display correct name component and points', async() => {
+				const el = await _createComponent(activityQuestionUsageHref);
+				const name = el.shadowRoot.querySelector('d2l-hc-name');
+				const input = el.shadowRoot.querySelector(`#points_input_${id}`);
 
-			expect(name.href).to.equal(linkPlacementHref);
-			expect(input.value).to.equal(points);
+				expect(name.href).to.equal(linkPlacementHref);
+				expect(input.value).to.equal(points);
+			});
+
+			it('should display expected description in slot with description', async() => {
+				const el = await _createComponent(activityQuestionUsageHref);
+				const description = el.shadowRoot.querySelector('#desc_div').textContent;
+				const hcDescriptionEl = el.shadowRoot.querySelector('#desc_div d2l-hc-description');
+
+				expect(description.includes(' - ')).to.be.true;
+				expect(hcDescriptionEl).to.not.be.null;
+			});
+
+			it('should display expected description in slot without description', async() => {
+				mockLink.reset();
+				setupFetchMocks({ linkPlacement: mockLinkPlacement(linkPlacementHref) });
+
+				const el = await _createComponent(activityQuestionUsageHref);
+				const description = el.shadowRoot.querySelector('#desc_div').textContent;
+				const hcDescriptionEl = el.shadowRoot.querySelector('#desc_div d2l-hc-description');
+
+				expect(description.includes(' - ')).to.be.false;
+				expect(hcDescriptionEl).to.be.null;
+			});
 		});
 
 		it('event gets triggered', async() => {

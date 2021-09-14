@@ -35,6 +35,16 @@ class ActivityQuestionUsage extends HypermediaStateMixin(BaseMixin(LitElement)) 
 				rel: rels.activityUsage,
 				prime: true
 			},
+			_description: {
+				observable: observableTypes.property,
+				route: [{
+					observable: observableTypes.link,
+					rel: rels.activityUsage
+				}, {
+					observable: observableTypes.link,
+					rel: rels.linkPlacement
+				}]
+			},
 			_setPoints: {
 				observable: observableTypes.action,
 				name: 'set-points'
@@ -86,6 +96,12 @@ class ActivityQuestionUsage extends HypermediaStateMixin(BaseMixin(LitElement)) 
 		return this.points && this.points > MIN_VALUE && this.points <= MAX_VALUE;
 	}
 
+	_renderDescription() {
+		return this._description ?
+			html`${this.localize('externalActivity')} - <d2l-hc-description href="${this._activityHref}" .token="${this.token}"></d2l-hc-description>` :
+			html`${this.localize('externalActivity')}`;
+	}
+
 	render() {
 		return html`
 		<d2l-list-item>
@@ -93,8 +109,8 @@ class ActivityQuestionUsage extends HypermediaStateMixin(BaseMixin(LitElement)) 
 				<div>
 					<d2l-hc-name href="${this._activityHref}" .token="${this.token}"></d2l-hc-name>
 				</div>
-				<div slot="secondary">
-					${this.localize('externalActivity')} - <d2l-hc-description href="${this._activityHref}" .token="${this.token}"></d2l-hc-description>
+				<div id="desc_div" slot="secondary">
+					${this._renderDescription()}
 				</div>
 			</d2l-list-item-content>
 			<div class="activity_list__points_input" slot="actions">

@@ -97,6 +97,19 @@ export function mockActivityUsage(linkPlacementHref) {
 	};
 }
 
+export function mockLinkPlacement(linkPlacementHref, description = null) {
+	return {
+		properties: {
+			name: 'some name',
+			description: description
+		},
+		links: [{
+			rel: ['self'],
+			href: linkPlacementHref
+		}]
+	};
+}
+
 export const activityCollection = [
 	{
 		id: 1,
