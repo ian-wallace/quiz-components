@@ -5,14 +5,19 @@ export const BaseMixin = superclass => class extends RtlMixin(LocalizeMixin(supe
 	static async getLocalizeResources(langs) {
 		let translations;
 		for await (const lang of langs) {
-			switch (lang) {
-				case 'en':
-					translations = await import('../../locales/en.js');
-					break;
-				case 'en-US':
-					translations = await import('../../locales/en.js');
-					break;
+			try {
+				let locale;
+				if (lang === 'en-US' || lang === 'en-us') {
+					locale = '../../locales/en.js';
+				} else {
+					locale = `../../locales/${lang}.js`;
+				}
+
+				translations = await import(locale);
+			} catch (_) {
+				console.error(`Locale ${lang} not found`);
 			}
+
 			if (translations && translations.val) {
 				return {
 					language: lang,
