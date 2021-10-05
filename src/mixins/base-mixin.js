@@ -5,62 +5,62 @@ export const BaseMixin = superclass => class extends RtlMixin(LocalizeMixin(supe
 	static async getLocalizeResources(langs) {
 		let translations;
 		for await (const lang of langs) {
-			switch (lang) {
+			switch (lang.toLowerCase()) {
 				case 'en':
 					translations = await import('../../locales/en.js');
 					break;
-				case 'en-US':
+				case 'en-us':
 					translations = await import('../../locales/en.js');
 					break;
-				case 'ar-SA':
+				case 'ar-sa':
 					translations = await import('../../locales/ar-SA.js');
 					break;
-				case 'cy-GB':
+				case 'cy-gb':
 					translations = await import('../../locales/cy-GB.js');
 					break;
-				case 'da-DK':
+				case 'da-dk':
 					translations = await import('../../locales/da-DK.js');
 					break;
-				case 'de-DE':
+				case 'de-de':
 					translations = await import('../../locales/de-DE.js');
 					break;
-				case 'es-ES':
+				case 'es-es':
 					translations = await import('../../locales/es-ES.js');
 					break;
-				case 'es-MX':
+				case 'es-mx':
 					translations = await import('../../locales/es-MX.js');
 					break;
-				case 'fr-CA':
+				case 'fr-ca':
 					translations = await import('../../locales/fr-CA.js');
 					break;
-				case 'fr-FR':
+				case 'fr-fr':
 					translations = await import('../../locales/fr-FR.js');
 					break;
-				case 'fr-ON':
+				case 'fr-on':
 					translations = await import('../../locales/fr-ON.js');
 					break;
-				case 'ja-JP':
+				case 'ja-jp':
 					translations = await import('../../locales/ja-JP.js');
 					break;
-				case 'ko-KR':
+				case 'ko-kr':
 					translations = await import('../../locales/ko-KR.js');
 					break;
-				case 'nl-NL':
+				case 'nl-nl':
 					translations = await import('../../locales/nl-NL.js');
 					break;
-				case 'pt-BR':
+				case 'pt-br':
 					translations = await import('../../locales/pt-BR.js');
 					break;
-				case 'sv-SE':
+				case 'sv-se':
 					translations = await import('../../locales/sv-SE.js');
 					break;
-				case 'tr-TR':
+				case 'tr-tr':
 					translations = await import('../../locales/tr-TR.js');
 					break;
-				case 'zh-CN':
+				case 'zh-cn':
 					translations = await import('../../locales/zh-CN.js');
 					break;
-				case 'zh-TW':
+				case 'zh-tw':
 					translations = await import('../../locales/zh-TW.js');
 					break;
 			}
