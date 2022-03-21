@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@brightspace-hmc/foundation-components": "BrightspaceHypermediaComponents/foundation-components.git#semver:^0",
-    "@brightspace-ui/core": "^1.145.0",
-    "lit-element": "^2.4.0"
+    "@brightspace-hmc/foundation-components": "BrightspaceHypermediaComponents/foundation-components.git#semver:^1",
+    "@brightspace-ui/core": "^2",
+    "lit-element": "^3"
   },
   "files": [
     "src/**",
@@ -14,7 +14,7 @@
     "quiz-components.serge.json"
   ],
   "devDependencies": {
-    "@open-wc/testing": "^2",
+    "@open-wc/testing": "^3",
     "@open-wc/testing-karma": "^4.0.9",
     "babel-eslint": "^10",
     "conventional-changelog-eslint": "^3.0.8",
